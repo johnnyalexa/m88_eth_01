@@ -7,8 +7,30 @@
 
 #include<avr/io.h>
 #include <string.h>
+#include <avr/interrupt.h>
+#include <stdlib.h>
 
 
+/*-------------------- Init_Uart      -------------------------
+*    Function:    Init_Uart
+*    Purpose:    Initialize serial connectivity @115200 baud.
+*
+*    Parameters:    none
+*    Returns:    none
+*------------------------------------------------------------*/
+void Init_Uart(void);
+void Init_Uart(void){
+	cli(); 
+	// Enable U2Xn to get a baud rate with less error margin
+	//UCSR0A = (1<<U2X0);
+	// Transmitter enable and Receiver enable
+	UCSR0B = (1<<TXEN0)|(1<<RXEN0);
+	// Asynchronous USART | No parity | 1 stopbit | CH size 8-bit
+	UCSR0C = (1<<UCSZ00) | (1<<UCSZ01) | (1<<USBS0);
+	// 115200 Baudrate @ 0.9216 Mhz
+	UBRR0L = 0x35; //9600
+	sei();
+}
 
 /*-------------------- USART_Transmit   -------------------------
 *    Function:    USART_Transmit

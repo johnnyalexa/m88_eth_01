@@ -97,6 +97,9 @@ int main(void){
 
         DDRB|= (1<<DDB1); // LED, enable PB1, LED as output
         LEDOFF;
+		
+		extern void Init_Uart(void);
+		Init_Uart();
         
         //init the ethernet/ip layer:
         init_udp_or_www_server(mymac,myip);
@@ -150,9 +153,29 @@ UDP:
                         if (buf[UDP_DATA_P]=='v' ){
                                 strcpy(str,"ver=B");
                                 itoa((enc28j60getrev()),&(str[5]),10);
-                        }else{
+                        }else
+						if (buf[UDP_DATA_P]=='a' ){
+							strcpy(str,"arici");
+						}else
+						if (buf[UDP_DATA_P]=='b' ){
+							strcpy(str,"babuin");
+						}else
+						if (buf[UDP_DATA_P]=='c' ){
+							strcpy(str,"camila");
+						}else	
+						if (buf[UDP_DATA_P]=='d' ){
+							strcpy(str,"dinozaur");
+						}else											
+						
+						{
 							// strcpy(str,(char*)buf);
+							//extern void USART_Transmit(uint8_t data);
+							//USART_Transmit(0x31);
+							extern void USART_print(char * text);
+							 
                                strcpy(str,"Sensolight! usage: ver");
+							   USART_print(&buf[UDP_DATA_P]);
+							   
                         }
                         make_udp_reply_from_request(buf,str,strnlen(str,35),MYUDPPORT);
                 }
