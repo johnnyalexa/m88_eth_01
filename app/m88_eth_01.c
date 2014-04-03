@@ -79,8 +79,10 @@ int main(void){
         // of clock the next four instructions.
         // Note that the CKDIV8 Fuse determines the initial
         // value of the CKKPS bits.
+#if defined(__AVR_ATmega88__)	
         CLKPR=(1<<CLKPCE);
         CLKPR=0; // 8 MHZ
+#endif
         _delay_loop_1(0); // 60us
         
         /*initialize enc28j60*/
