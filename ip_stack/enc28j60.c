@@ -28,7 +28,7 @@ static uint8_t Enc28j60Bank;
 static int16_t gNextPacketPtr;
 #define ENC28J60_CONTROL_PORT   PORTB
 #define ENC28J60_CONTROL_DDR    DDRB
-#if defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__) || defined(__AVR_ATmega88P__) || defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328P__) 
+#if defined(__AVR_ATmega8__) || defined(__AVR_ATmega48__) || defined(__AVR_ATmega88__) || defined(__AVR_ATmega88P__) || defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328P__) 
 #define ENC28J60_CONTROL_CS PORTB2
 #define ENC28J60_CONTROL_SO PORTB4
 #define ENC28J60_CONTROL_SI PORTB3

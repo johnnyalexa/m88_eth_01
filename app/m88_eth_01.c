@@ -37,7 +37,7 @@ static uint8_t myip[4] = {192,168,0,111}; // aka http://10.0.0.29/
 //// listen port for udp
 #define MYUDPPORT 4601
 
-#define BUFFER_SIZE 550
+#define BUFFER_SIZE 350
 static uint8_t buf[BUFFER_SIZE+1];
 
 // set output to VCC, red LED off
@@ -104,8 +104,10 @@ int main(void){
 		Init_Uart();
         
         //init the ethernet/ip layer:
-        init_udp_or_www_server(mymac,myip);
+        init_udp_or_www_server(mymac,myip);	
+#ifdef WWW_server			
         www_server_port(MYWWWPORT);
+#endif		
 
         while(1){
                 // handle ping and wait for a tcp packet:
@@ -118,6 +120,7 @@ int main(void){
                         // check for udp
                         goto UDP;
                 }
+#ifdef WWW_server
                 // tcp port 80 begin
                 if (strncmp("GET ",(char *)&(buf[dat_p]),4)!=0){
                         // head, post and other methods:
@@ -139,6 +142,7 @@ SENDTCP:
                 www_server_reply(buf,dat_p); // send web page data
                 continue;
                 // tcp port 80 end
+#endif //WWW_server				
                 //--------------------------
                 // udp start, we listen on udp port 1200=0x4B0
 UDP:
