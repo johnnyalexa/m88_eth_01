@@ -34,7 +34,7 @@ void Init_Uart(void){
 }
 #else
 
-#define FOSC 12500000// Clock Speed
+#define FOSC 8000000// Clock Speed
 #define BAUD 9600
 #define MYUBRR FOSC/16/BAUD-1
 
@@ -42,8 +42,10 @@ void Init_Uart(void){
 	cli();
 	
 	/* Set baud rate */
-	UBRRH = (unsigned char)((MYUBRR)>>8);
-	UBRRL = (unsigned char)MYUBRR;
+	//UBRRH = (unsigned char)((MYUBRR)>>8);
+	//UBRRL = (unsigned char)MYUBRR;
+	UBRRH = 0;
+	UBRRL = 0x33; //9600@8Mhz
 	/* Enable receiver and transmitter */
 	UCSRB = (1<<RXEN)|(1<<TXEN);
 	/* Set frame format: 8data, 1stop bit */

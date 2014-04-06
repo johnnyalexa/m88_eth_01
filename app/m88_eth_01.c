@@ -37,7 +37,7 @@ static uint8_t myip[4] = {192,168,0,111}; // aka http://10.0.0.29/
 //// listen port for udp
 #define MYUDPPORT 4601
 
-#define BUFFER_SIZE 350
+#define BUFFER_SIZE 550
 static uint8_t buf[BUFFER_SIZE+1];
 
 // set output to VCC, red LED off
@@ -79,7 +79,7 @@ int main(void){
         // of clock the next four instructions.
         // Note that the CKDIV8 Fuse determines the initial
         // value of the CKKPS bits.
-#if defined(__AVR_ATmega88__)	
+#if 0 // !defined(__AVR_ATmega8__)	
         CLKPR=(1<<CLKPCE);
         CLKPR=0; // 8 MHZ
 #endif
