@@ -10,6 +10,8 @@
 #include <avr/interrupt.h>
 #include <stdlib.h>
 
+#define F_CPU     8000000 //8Mhz
+#include <util/delay.h>
 
 /*-------------------- Init_Uart      -------------------------
 *    Function:    Init_Uart
@@ -132,7 +134,7 @@ uint8_t USART_Receive(uint8_t * data)
 *        text - pointer to byte array (string)
 *    Returns: none
 *------------------------------------------------------------*/
-void USART_print(char * text);
+
 void USART_print(char * text){
 	
 	uint8_t text_size=strlen(text);
@@ -140,6 +142,7 @@ void USART_print(char * text){
 	
 	for(i=0;i<text_size;i++){
 		USART_Transmit(text[i]);
+		_delay_ms(30); // added to be able to display on stm32
 	}
 	USART_Transmit(0x0D);
 	USART_Transmit(0x0A);

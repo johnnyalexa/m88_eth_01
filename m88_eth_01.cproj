@@ -188,10 +188,16 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="app\config.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="app\m88_eth_01.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="app\m88_uart.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="app\NVM.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="ip_stack\enc28j60.c">

@@ -24,6 +24,8 @@
 #include "../ip_stack/enc28j60.h"
 #include "../ip_stack/timeout.h"
 #include "../ip_stack/net.h"
+#include "config.h"
+#include <stdio.h>
 
 // please modify the following two lines. mac and ip have to be unique
 // in your local area network. You can not have the same numbers in
@@ -35,7 +37,7 @@ static uint8_t myip[4] = {192,168,0,111}; // aka http://10.0.0.29/
 // listen port for www
 #define MYWWWPORT 8082
 //// listen port for udp
-#define MYUDPPORT 4601
+#define MYUDPPORT_DEFAULT 4601
 
 #define BUFFER_SIZE 550
 static uint8_t buf[BUFFER_SIZE+1];
@@ -69,16 +71,41 @@ uint16_t print_webpage(uint8_t *buf)
 }
 
 int main(void){
+	
+	
         uint16_t dat_p,plen;
         uint8_t payloadlen=0;
         char str[20];
-        
+        uint8_t SetNewConfig = 0;
+		int config_rc = 0;
+		Eth_config_t current_config;
+		int scan_tmp[5];
+		int scanf_rc =0 ;
+
         // Set the clock speed to "no pre-scaler" (8MHz with internal osc or 
         // full external speed)
         // set the clock prescaler. First write CLKPCE to enable setting 
         // of clock the next four instructions.
         // Note that the CKDIV8 Fuse determines the initial
         // value of the CKKPS bits.
+		
+		
+		Init_Uart();
+		//USART_print("Reset");
+
+		
+		config_rc=NVM_LoadConfig(&current_config);
+		if(config_rc<0){
+			current_config.ip[0]=myip[0];
+			current_config.ip[1]=myip[1];
+			current_config.ip[2]=myip[2];
+			current_config.ip[3]=myip[3];
+			current_config.port=MYUDPPORT_DEFAULT;
+			NVM_SaveConfig(&current_config);
+			//goto CONFIG_SET;
+		}
+		//USART_Transmit(0x30 + config_rc);
+		
 #if 0 // !defined(__AVR_ATmega8__)	
         CLKPR=(1<<CLKPCE);
         CLKPR=0; // 8 MHZ
@@ -100,11 +127,10 @@ int main(void){
         DDRB|= (1<<DDB1); // LED, enable PB1, LED as output
         LEDOFF;
 		
-		extern void Init_Uart(void);
-		Init_Uart();
+
         
         //init the ethernet/ip layer:
-        init_udp_or_www_server(mymac,myip);	
+        init_udp_or_www_server(mymac,current_config.ip);	
 #ifdef WWW_server			
         www_server_port(MYWWWPORT);
 #endif		
@@ -114,6 +140,8 @@ int main(void){
                 plen=enc28j60PacketReceive(BUFFER_SIZE, buf);
                 dat_p=packetloop_arp_icmp_tcp(buf,plen);
 
+				if(SetNewConfig !=0 )
+					goto CONFIG_SET;
                 /* dat_p will ne unequal to zero if there is a valid 
                  * http get */
                 if(dat_p==0){
@@ -151,40 +179,51 @@ UDP:
                         continue;
                 }
                 if (buf[IP_PROTO_P] == IP_PROTO_UDP_V &&\
-				    buf[UDP_DST_PORT_H_P] == (MYUDPPORT>>8) &&\
-					buf[UDP_DST_PORT_L_P] == (MYUDPPORT&0xff)) {
+				    buf[UDP_DST_PORT_H_P] == (current_config.port>>8) &&\
+					buf[UDP_DST_PORT_L_P] == (current_config.port&0xff)) {
                         payloadlen=buf[UDP_LEN_L_P]-UDP_HEADER_LEN;
                         // you must sent a string starting with v
                         // e.g udpcom version 10.0.0.24
-                        if (buf[UDP_DATA_P]=='v' ){
-                                strcpy(str,"ver=B");
-                                itoa((enc28j60getrev()),&(str[5]),10);
-                        }else
-						if (buf[UDP_DATA_P]=='a' ){
-							strcpy(str,"arici");
+  						if (buf[UDP_DATA_P]=='*' ){
+							  scanf_rc = sscanf(&buf[UDP_DATA_P],"*%d.%d.%d.%d:%d", 
+												&scan_tmp[0],
+												&scan_tmp[1],
+												&scan_tmp[2],
+												&scan_tmp[3],
+												&scan_tmp[4]
+												);
+																	
+											//	USART_Transmit(0x30+scanf_rc);
+								if(scanf_rc !=5 )				
+									strcpy(str,"Config error: Please use format *IP:port");
+								else{
+									current_config.ip[0]=scan_tmp[0];
+									current_config.ip[1]=scan_tmp[1];
+									current_config.ip[2]=scan_tmp[2];
+									current_config.ip[3]=scan_tmp[3];
+									current_config.port=scan_tmp[4];
+									NVM_SaveConfig(&current_config);
+									strcpy(str,"Config set OK. Restarting...");
+									SetNewConfig = 1;
+								}
+								
 						}else
-						if (buf[UDP_DATA_P]=='b' ){
-							strcpy(str,"babuin");
-						}else
-						if (buf[UDP_DATA_P]=='c' ){
-							strcpy(str,"camila");
-						}else	
-						if (buf[UDP_DATA_P]=='d' ){
-							strcpy(str,"dinozaur");
-						}else											
-						
 						{
 							// strcpy(str,(char*)buf);
 							//extern void USART_Transmit(uint8_t data);
 							//USART_Transmit(0x31);
 							extern void USART_print(char * text);
-							 
-                               strcpy(str,"Sensolight! usage: ver");
+                               strcpy(str,"OK");
 							   USART_print(&buf[UDP_DATA_P]);
 							   
                         }
-                        make_udp_reply_from_request(buf,str,strnlen(str,35),MYUDPPORT);
+                        make_udp_reply_from_request(buf,str,strnlen(str,35),current_config.port);
                 }
         }
+		/// Reach here only if new config must be set
+		
+CONFIG_SET:		
+		//USART_print("Rst_AVR");
+		Reset_AVR();
         return (0);
 }

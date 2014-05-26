@@ -40,6 +40,7 @@ SUBDIRS :=  \
 C_SRCS +=  \
 ../app/m88_eth_01.c \
 ../app/m88_uart.c \
+../app/NVM.c \
 ../ip_stack/enc28j60.c \
 ../ip_stack/ip_arp_udp_tcp.c \
 ../ip_stack/websrv_help_functions.c
@@ -54,6 +55,7 @@ ASM_SRCS +=
 OBJS +=  \
 app/m88_eth_01.o \
 app/m88_uart.o \
+app/NVM.o \
 ip_stack/enc28j60.o \
 ip_stack/ip_arp_udp_tcp.o \
 ip_stack/websrv_help_functions.o
@@ -61,6 +63,7 @@ ip_stack/websrv_help_functions.o
 OBJS_AS_ARGS +=  \
 app/m88_eth_01.o \
 app/m88_uart.o \
+app/NVM.o \
 ip_stack/enc28j60.o \
 ip_stack/ip_arp_udp_tcp.o \
 ip_stack/websrv_help_functions.o
@@ -68,6 +71,7 @@ ip_stack/websrv_help_functions.o
 C_DEPS +=  \
 app/m88_eth_01.d \
 app/m88_uart.d \
+app/NVM.d \
 ip_stack/enc28j60.d \
 ip_stack/ip_arp_udp_tcp.d \
 ip_stack/websrv_help_functions.d
@@ -75,6 +79,7 @@ ip_stack/websrv_help_functions.d
 C_DEPS_AS_ARGS +=  \
 app/m88_eth_01.d \
 app/m88_uart.d \
+app/NVM.d \
 ip_stack/enc28j60.d \
 ip_stack/ip_arp_udp_tcp.d \
 ip_stack/websrv_help_functions.d
@@ -90,6 +95,8 @@ OUTPUT_FILE_DEP:= ./makedep.mk
 LIB_DEP+= 
 
 # AVR32/GNU C Compiler
+
+
 
 
 
