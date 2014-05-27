@@ -38,7 +38,7 @@ uint8_t get_loop(void){
 *------------------------------------------------------------*/
 uint8_t NVM_GetCurrentPosition(void){
 	uint8_t U8_value1,U8_value2;
-	uint8_t U8_position;
+	uint8_t U8_position= 0;
 	
 	//Read first status byte	
 	U8_value1 = eeprom_read_byte((const uint8_t *)STATUS_START_ADDRESS);

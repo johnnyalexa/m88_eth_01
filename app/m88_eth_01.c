@@ -30,9 +30,9 @@
 // please modify the following two lines. mac and ip have to be unique
 // in your local area network. You can not have the same numbers in
 // two devices:
-// how did I get the mac addr? Translate the first 3 numbers into ascii is: TUX
-static uint8_t mymac[6] = {0x54,0x55,0x58,0x10,0x00,0x29};
-static uint8_t myip[4] = {192,168,0,111}; // aka http://10.0.0.29/
+// how did I get the mac addr? x S L F x x 
+static uint8_t defaultmac[6] = {0x00,0x53,0x4C,0x46,0x00,0x01};
+static uint8_t defaultip[4] = {192,168,0,111}; // aka http://10.0.0.29/
 
 // listen port for www
 #define MYWWWPORT 8082
@@ -96,10 +96,16 @@ int main(void){
 		
 		config_rc=NVM_LoadConfig(&current_config);
 		if(config_rc<0){
-			current_config.ip[0]=myip[0];
-			current_config.ip[1]=myip[1];
-			current_config.ip[2]=myip[2];
-			current_config.ip[3]=myip[3];
+			current_config.mac[0]=defaultmac[0];
+			current_config.mac[1]=defaultmac[1];
+			current_config.mac[2]=defaultmac[2];
+			current_config.mac[3]=defaultmac[3];
+			current_config.mac[4]=defaultmac[4];
+			current_config.mac[5]=defaultmac[5];
+			current_config.ip[0]=defaultip[0];
+			current_config.ip[1]=defaultip[1];
+			current_config.ip[2]=defaultip[2];
+			current_config.ip[3]=defaultip[3];
 			current_config.port=MYUDPPORT_DEFAULT;
 			NVM_SaveConfig(&current_config);
 			//goto CONFIG_SET;
@@ -113,7 +119,7 @@ int main(void){
         _delay_loop_1(0); // 60us
         
         /*initialize enc28j60*/
-        enc28j60Init(mymac);
+        enc28j60Init(current_config.mac);
         enc28j60clkout(2); // change clkout from 6.25MHz to 12.5MHz
         _delay_loop_1(0); // 60us
         
@@ -130,7 +136,7 @@ int main(void){
 
         
         //init the ethernet/ip layer:
-        init_udp_or_www_server(mymac,current_config.ip);	
+        init_udp_or_www_server(current_config.mac,current_config.ip);	
 #ifdef WWW_server			
         www_server_port(MYWWWPORT);
 #endif		
@@ -208,6 +214,25 @@ UDP:
 								}
 								
 						}else
+						if (buf[UDP_DATA_P]==':' ){
+							scanf_rc = sscanf(&buf[UDP_DATA_P],":%x:%x",
+							&scan_tmp[0],
+							&scan_tmp[1]						
+							);
+							
+							//	USART_Transmit(0x30+scanf_rc);
+							if(scanf_rc !=2 )
+							strcpy(str,"Config error: Please use format :a4:92 as mac5 and mac6!");
+							else{
+								current_config.mac[4]=scan_tmp[0];
+								current_config.mac[5]=scan_tmp[1];
+								NVM_SaveConfig(&current_config);
+								strcpy(str,"Config set OK. Restarting...");
+								SetNewConfig = 1;
+							}
+							
+						}else
+						
 						{
 							// strcpy(str,(char*)buf);
 							//extern void USART_Transmit(uint8_t data);

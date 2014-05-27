@@ -18,6 +18,7 @@ uint8_t USART_Receive(uint8_t * data);
 void USART_Transmit(uint8_t data);
 
 typedef struct Eth_config{
+	uint8_t		mac[6];
 	uint8_t		ip[4];
 	uint16_t	port;
 	uint8_t		status;
