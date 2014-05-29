@@ -81,6 +81,7 @@ int main(void){
 		Eth_config_t current_config;
 		int scan_tmp[5];
 		int scanf_rc =0 ;
+		int reset_rc=0;
 
         // Set the clock speed to "no pre-scaler" (8MHz with internal osc or 
         // full external speed)
@@ -92,10 +93,15 @@ int main(void){
 		
 		Init_Uart();
 		//USART_print("Reset");
+		GPIO_init();
+		
+		//check for reset values
+		
+		reset_rc = GetResetSw();
 
 		
 		config_rc=NVM_LoadConfig(&current_config);
-		if(config_rc<0){
+		if((config_rc<0)||(reset_rc!=0)){
 			current_config.mac[0]=defaultmac[0];
 			current_config.mac[1]=defaultmac[1];
 			current_config.mac[2]=defaultmac[2];
@@ -110,6 +116,11 @@ int main(void){
 			NVM_SaveConfig(&current_config);
 			//goto CONFIG_SET;
 		}
+		
+		//we are ready 
+		STATUS_ON();
+		
+		
 		//USART_Transmit(0x30 + config_rc);
 		
 #if 0 // !defined(__AVR_ATmega8__)	

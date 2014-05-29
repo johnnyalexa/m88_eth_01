@@ -2,6 +2,8 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+app\GPIO.c
+
 app\m88_eth_01.c
 
 app\m88_uart.c

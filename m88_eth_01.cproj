@@ -191,6 +191,9 @@
     <Compile Include="app\config.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="app\GPIO.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="app\m88_eth_01.c">
       <SubType>compile</SubType>
     </Compile>

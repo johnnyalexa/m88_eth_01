@@ -12,6 +12,21 @@
 #include <avr/wdt.h>
 
 
+#define STATUS_LED_PORT		PORTD
+#define STATUS_LED			(1<<PD6)
+#define RESET_SW_PORT		PIND
+#define RESET_SW_PIN		(1<<PIND6)
+
+#define STATUS_ON()		STATUS_LED_PORT|=STATUS_LED
+#define STATUS_OFF()	STATUS_LED_PORT&=~STATUS_LED
+#define STATUS_TOGGLE()	STATUS_LED_PORT^=STATUS_LED
+
+#define RESET_SW_IS_PUSHED()	!(RESET_SW_PORT&RESET_SW_PIN)
+
+void GPIO_init(void);
+int GetResetSw(void);
+
+
 void Init_Uart(void);
 void USART_print(char * text);
 uint8_t USART_Receive(uint8_t * data);

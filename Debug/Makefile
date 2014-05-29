@@ -38,6 +38,7 @@ SUBDIRS :=  \
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../app/GPIO.c \
 ../app/m88_eth_01.c \
 ../app/m88_uart.c \
 ../app/NVM.c \
@@ -53,6 +54,7 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+app/GPIO.o \
 app/m88_eth_01.o \
 app/m88_uart.o \
 app/NVM.o \
@@ -61,6 +63,7 @@ ip_stack/ip_arp_udp_tcp.o \
 ip_stack/websrv_help_functions.o
 
 OBJS_AS_ARGS +=  \
+app/GPIO.o \
 app/m88_eth_01.o \
 app/m88_uart.o \
 app/NVM.o \
@@ -69,6 +72,7 @@ ip_stack/ip_arp_udp_tcp.o \
 ip_stack/websrv_help_functions.o
 
 C_DEPS +=  \
+app/GPIO.d \
 app/m88_eth_01.d \
 app/m88_uart.d \
 app/NVM.d \
@@ -77,6 +81,7 @@ ip_stack/ip_arp_udp_tcp.d \
 ip_stack/websrv_help_functions.d
 
 C_DEPS_AS_ARGS +=  \
+app/GPIO.d \
 app/m88_eth_01.d \
 app/m88_uart.d \
 app/NVM.d \
@@ -95,6 +100,8 @@ OUTPUT_FILE_DEP:= ./makedep.mk
 LIB_DEP+= 
 
 # AVR32/GNU C Compiler
+
+
 
 
 
