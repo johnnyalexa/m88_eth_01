@@ -9,9 +9,23 @@
 #include <string.h>
 #include <avr/interrupt.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include "config.h"
 
 #define F_CPU     8000000 //8Mhz
 #include <util/delay.h>
+
+
+#ifdef LOGGING
+int usart_putchar_printf(char var, FILE *stream);
+
+/*
+*
+*	Set the standard I/O stream to be used in the project
+*
+*/
+static FILE mystdio = FDEV_SETUP_STREAM(usart_putchar_printf, NULL, _FDEV_SETUP_WRITE);
+#endif
 
 /*-------------------- Init_Uart      -------------------------
 *    Function:    Init_Uart
@@ -54,6 +68,10 @@ void Init_Uart(void){
 	UCSRC = (1<<URSEL)|(3<<UCSZ0);
 	
 	sei();
+#ifdef LOGGING	
+	// setup our stdio stream
+	stdout= &mystdio;
+#endif	
 }
 #endif
 
@@ -147,3 +165,22 @@ void USART_print(char * text){
 	USART_Transmit(0x0D);
 	USART_Transmit(0x0A);
 }
+
+#ifdef LOGGING
+/*-------------------- usart_putchar_printf   -------------------------
+*    Function:    usart_putchar_printf
+*    Purpose:    Sends a character through a stream.
+*
+*    Parameters:
+*        var - character to be transmited
+*		stream - pointer to the I/O stream
+*    Returns:
+*		0 - always error free
+*------------------------------------------------------------*/
+int usart_putchar_printf(char var, FILE *stream) {
+	// translate \n to \r for br@y++ terminal
+	if (var == '\n') USART_Transmit('\r');
+	USART_Transmit(var);
+	return 0;
+}
+#endif

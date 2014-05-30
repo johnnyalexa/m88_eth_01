@@ -32,7 +32,7 @@
 // two devices:
 // how did I get the mac addr? x S L F x x 
 static uint8_t defaultmac[6] = {0x00,0x53,0x4C,0x46,0x00,0x01};
-static uint8_t defaultip[4] = {192,168,0,111}; // aka http://10.0.0.29/
+static uint8_t defaultip[4] = {192,168,1,5}; // aka http://10.0.0.29/
 
 // listen port for www
 #define MYWWWPORT 8082
@@ -82,6 +82,7 @@ int main(void){
 		int scan_tmp[5];
 		int scanf_rc =0 ;
 		int reset_rc=0;
+		int led_count=0;
 
         // Set the clock speed to "no pre-scaler" (8MHz with internal osc or 
         // full external speed)
@@ -92,7 +93,7 @@ int main(void){
 		
 		
 		Init_Uart();
-		//USART_print("Reset");
+			LOG("Reset");
 		GPIO_init();
 		
 		//check for reset values
@@ -101,6 +102,20 @@ int main(void){
 
 		
 		config_rc=NVM_LoadConfig(&current_config);
+		LOG("Mac:%x:%x:%x:%x:%x:%x\n",
+									current_config.mac[0],
+									current_config.mac[1],
+									current_config.mac[2],
+									current_config.mac[3],
+									current_config.mac[4],
+									current_config.mac[5]);
+									
+		LOG("IP and port: %d.%d.%d.%d:%d",
+										current_config.ip[0],
+										current_config.ip[1],
+										current_config.ip[2],
+										current_config.ip[3],
+										current_config.port);
 		if((config_rc<0)||(reset_rc!=0)){
 			current_config.mac[0]=defaultmac[0];
 			current_config.mac[1]=defaultmac[1];
@@ -114,9 +129,10 @@ int main(void){
 			current_config.ip[3]=defaultip[3];
 			current_config.port=MYUDPPORT_DEFAULT;
 			NVM_SaveConfig(&current_config);
+			LOG("Config default");
 			//goto CONFIG_SET;
 		}
-		
+			LOG("Config Loaded");
 		//we are ready 
 		STATUS_ON();
 		
@@ -131,7 +147,9 @@ int main(void){
         
         /*initialize enc28j60*/
         enc28j60Init(current_config.mac);
+			LOG("Init enc");
         enc28j60clkout(2); // change clkout from 6.25MHz to 12.5MHz
+			LOG("change enc clk to 12.5mhz");
         _delay_loop_1(0); // 60us
         
         /* Magjack leds configuration, see enc28j60 datasheet, page 11 */
@@ -148,15 +166,22 @@ int main(void){
         
         //init the ethernet/ip layer:
         init_udp_or_www_server(current_config.mac,current_config.ip);	
+			LOG("Init udp server and start tcp");
 #ifdef WWW_server			
         www_server_port(MYWWWPORT);
 #endif		
 
         while(1){
+				led_count++;
                 // handle ping and wait for a tcp packet:
                 plen=enc28j60PacketReceive(BUFFER_SIZE, buf);
                 dat_p=packetloop_arp_icmp_tcp(buf,plen);
-
+				if(led_count<50){
+					STATUS_ON();
+				}else if (led_count<100){
+					STATUS_OFF();
+				}else
+					led_count=0;
 				if(SetNewConfig !=0 )
 					goto CONFIG_SET;
                 /* dat_p will ne unequal to zero if there is a valid 

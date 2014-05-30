@@ -15,13 +15,21 @@
 #define STATUS_LED_PORT		PORTD
 #define STATUS_LED			(1<<PD6)
 #define RESET_SW_PORT		PIND
-#define RESET_SW_PIN		(1<<PIND6)
+#define RESET_SW_PIN		(1<<PIND7)
 
 #define STATUS_ON()		STATUS_LED_PORT|=STATUS_LED
 #define STATUS_OFF()	STATUS_LED_PORT&=~STATUS_LED
 #define STATUS_TOGGLE()	STATUS_LED_PORT^=STATUS_LED
 
 #define RESET_SW_IS_PUSHED()	!(RESET_SW_PORT&RESET_SW_PIN)
+
+//#define LOGGING 1
+
+#ifdef LOGGING
+#define LOG(...)	printf(__VA_ARGS__)
+#else
+#define LOG(...)	{}
+#endif
 
 void GPIO_init(void);
 int GetResetSw(void);

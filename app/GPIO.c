@@ -23,9 +23,9 @@ int GetResetSw(void){
 	int rc = 0;
 	int i;
 	if(RESET_SW_IS_PUSHED()){
-		for(i=0;i<100;i++){
+		for(i=0;i<30;i++){
 			STATUS_TOGGLE();
-			_delay_ms(50);
+			_delay_ms(100);
 		}
 		if(RESET_SW_IS_PUSHED())
 			rc = 1;
