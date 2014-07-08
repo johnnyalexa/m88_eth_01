@@ -32,7 +32,7 @@
 // two devices:
 // how did I get the mac addr? x S L F x x 
 static uint8_t defaultmac[6] = {0x00,0x53,0x4C,0x46,0x00,0x01};
-static uint8_t defaultip[4] = {192,168,1,5}; // aka http://10.0.0.29/
+static uint8_t defaultip[4] = {192,168,0,5}; // aka http://10.0.0.29/
 
 // listen port for www
 #define MYWWWPORT 8082
@@ -83,7 +83,7 @@ int main(void){
 		int scanf_rc =0 ;
 		int reset_rc=0;
 		int led_count=0;
-
+		
         // Set the clock speed to "no pre-scaler" (8MHz with internal osc or 
         // full external speed)
         // set the clock prescaler. First write CLKPCE to enable setting 
@@ -93,7 +93,7 @@ int main(void){
 		
 		
 		Init_Uart();
-			LOG("Reset");
+			LOG("Reset\n");
 		GPIO_init();
 		
 		//check for reset values
@@ -102,7 +102,7 @@ int main(void){
 
 		
 		config_rc=NVM_LoadConfig(&current_config);
-		LOG("Mac:%x:%x:%x:%x:%x:%x\n",
+		LOG("Mac:%02x:%02x:%02x:%02x:%02x:%02x\n",
 									current_config.mac[0],
 									current_config.mac[1],
 									current_config.mac[2],
@@ -135,8 +135,7 @@ int main(void){
 			LOG("Config Loaded");
 		//we are ready 
 		STATUS_ON();
-		
-		
+
 		//USART_Transmit(0x30 + config_rc);
 		
 #if 0 // !defined(__AVR_ATmega8__)	
@@ -161,8 +160,6 @@ int main(void){
 
         DDRB|= (1<<DDB1); // LED, enable PB1, LED as output
         LEDOFF;
-		
-
         
         //init the ethernet/ip layer:
         init_udp_or_www_server(current_config.mac,current_config.ip);	
@@ -170,7 +167,19 @@ int main(void){
 #ifdef WWW_server			
         www_server_port(MYWWWPORT);
 #endif		
-
+		_delay_ms(2000);
+		USART_print("@     ");
+		_delay_ms(20);
+		sprintf(str,"#%d.%d.%d.%d",
+						current_config.ip[0],
+						current_config.ip[1],
+						current_config.ip[2],
+						current_config.ip[3]);
+		USART_print(str);
+		_delay_ms(2000);
+		USART_print("#         ");
+		_delay_ms(20);
+		USART_print("@LAS VEGAS  LAS VEGAS ");
         while(1){
 				led_count++;
                 // handle ping and wait for a tcp packet:
